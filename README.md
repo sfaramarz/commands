@@ -6,7 +6,7 @@ Shared Claude Code slash commands for the team.
 
 ## Commands
 
-### `/plc-doc` — PLC Document Creator
+### `/plc-docs-generator` — PLC Document Creator
 
 Automatically populates a Confluence PLC (Product Life Cycle) template with real content gathered from Jira, Confluence, Obsidian, meeting notes, and web search — then publishes it as a new Confluence page.
 
@@ -21,7 +21,7 @@ Automatically populates a Confluence PLC (Product Life Cycle) template with real
 **Example usage inside Claude Code:**
 
 ```
-/plc-doc
+/plc-docs-generator
 > Create an SPP titled "Widget v2 Software Project Plan" in space LS. Use Jira project WIDGET for context.
 ```
 
@@ -38,7 +38,7 @@ cd claude-commands
 
 ### 2. Set up your Confluence credentials
 
-Create a `.env` file at the path referenced inside the command (or adjust the path in `.claude/commands/plc-doc.md` to point to your own `.env`):
+Create a `.env` file at the path referenced inside the command (or adjust the path in `.claude/commands/plc-docs-generator.md` to point to your own `.env`):
 
 ```env
 CONFLUENCE_BASE_URL=https://your-org.atlassian.net/wiki
@@ -50,7 +50,7 @@ To generate an API token: [id.atlassian.com](https://id.atlassian.com) → Secur
 
 ### 3. Update the template IDs
 
-Open `.claude/commands/plc-doc.md` and replace the template IDs and URLs in the **Fixed Templates** table with the correct ones for your Confluence space. Ask your team lead for the right IDs if you don't have them.
+Open `.claude/commands/plc-docs-generator.md` and replace the template IDs and URLs in the **Fixed Templates** table with the correct ones for your Confluence space. Ask your team lead for the right IDs if you don't have them.
 
 ### 4. Open Claude Code from this directory
 
@@ -59,7 +59,7 @@ cd claude-commands
 claude
 ```
 
-The `/plc-doc` command will be available automatically. Claude Code loads commands from `.claude/commands/` in the current working directory.
+The `/plc-docs-generator` command will be available automatically. Claude Code loads commands from `.claude/commands/` in the current working directory.
 
 ---
 
