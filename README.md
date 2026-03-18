@@ -10,7 +10,7 @@ Template-driven document generation for Confluence PLC workflows.
 
 | Skill | Description |
 |-------|-------------|
-| [plc-doc-gen](doc-generators/plc-doc-gen/) | Populate a Confluence PLC template (SPP, SRD, or SADD) with real content from Jira, Confluence, Obsidian, and meeting notes — then publish as a new Confluence page |
+| [plc-doc-gen](doc-generators/plc-doc-gen/) | Create all three PLC documents (SPP, SRD, SADD) populated with content from source code, Jira, Confluence, Obsidian, and program materials — publishes all three as Confluence pages nested under a parent page |
 
 ### Report Generators
 
@@ -25,7 +25,7 @@ Workstream status reporting and stakeholder communication.
 
 Skills are loaded automatically from this directory by Claude Code. Invoke by name:
 
-- `/doc-generators:plc-doc-gen` — create an SPP, SRD, or SADD on Confluence
+- `/doc-generators:plc-doc-gen` — create all three PLC documents (SPP, SRD, SADD) nested under a parent Confluence page
 - `/report-generators:fv-report-gen` — generate a FrameView weekly status report
 - `/report-generators:plc-top5-report-gen` — generate a PLC Top 5 report for all LSS RTX programs
 

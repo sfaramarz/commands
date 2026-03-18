@@ -1,19 +1,19 @@
 ---
 name: plc-docs
-description: Populate a Confluence PLC template (SPP, SRD, or SADD) with real content from Jira, Confluence, Obsidian, and meeting notes — then publish it as a new Confluence page. Use when asked to create a Software Project Plan, Requirements Document, or Architecture Design Document.
+description: Populate all three Confluence PLC templates (SPP, SRD, and SADD) with real content from source code, Jira, Confluence, Obsidian, and program materials — then publish all three as new Confluence pages nested under a parent page. Use when asked to create PLC documents, a Software Project Plan, Requirements Document, or Architecture Design Document.
 license: MIT
 metadata:
   author: Sherry Faramarz
-  version: "1.0.0"
+  version: "2.0.0"
   last-updated: "2026-03-18"
 ---
 # PLC Document Creator
 
-Populate a Confluence PLC (Product Life Cycle) template page with real content using gathered context, then publish the result as a new Confluence page.
+Create all three PLC documents (SPP, SRD, SADD) for a program, populate them with real content, and publish them as Confluence pages nested under a provided parent page.
 
 ## Fixed Templates
 
-The following official templates are always used — do **not** ask the user for a template URL:
+The following official templates are always used — do **not** ask the user for template URLs:
 
 | Document Type | Template ID | URL |
 |---|---|---|
@@ -21,11 +21,11 @@ The following official templates are always used — do **not** ask the user for
 | **SRD** — Software Requirements Document | `2584970602` | https://nvidia.atlassian.net/wiki/spaces/RP/pages/2584970602/ |
 | **SADD** — Software Architecture & Design Document | `2584970600` | https://nvidia.atlassian.net/wiki/spaces/RP/pages/2584970600/ |
 
-When the user invokes this skill without specifying a document type, ask them which of the three they want to create.
+All three documents are **always** created. Do not ask the user which type to create.
 
 ## Document Title Naming Convention
 
-The title of the generated Confluence page is derived automatically from the **Program Name** and document type — do **not** ask the user for a title separately:
+Titles are derived automatically from the **Program Name** — do **not** ask the user for titles:
 
 | Document Type | Title Format |
 |---|---|
@@ -60,39 +60,82 @@ print("Confluence auth OK:", resp.json().get("displayName"))
 ```
 
 - If the call **succeeds**, proceed to Step 1.
-- If the call **fails** (missing env vars, 401, network error), stop immediately and tell the user what is wrong (e.g. missing `CONFLUENCE_API_TOKEN`, invalid credentials). Do not proceed until credentials are valid.
+- If the call **fails** (missing env vars, 401, network error), stop immediately and tell the user what is wrong. Do not proceed until credentials are valid.
 
-### Step 1 — Collect basic info
-Ask for (if not already provided):
-1. **Program name**: The name of the program this document is for (e.g. `Widget v2`, `Rendering Engine`, `Audio Pipeline`)
-2. **Document type**: `SPP`, `SRD`, or `SADD`
-3. **Space**: Confluence space key (e.g. `LightspeedStudios`, `NVDRV`)
-4. **Parent page** ID or URL to nest the new page under
+### Step 1 — Collect all info upfront (single unified step)
 
-Once the program name and document type are known, derive the page title automatically using the naming convention above.
+Ask for everything at once using `AskUserQuestion`. Collect:
 
-### Step 2 — Ask for sources (required step, do not skip)
-Once the basic info is collected, ask the user which sources to use for content generation using `AskUserQuestion` with `multiSelect: true`:
+**Document basics (all mandatory):**
+1. **Program name** — e.g. `Widget v2`, `Rendering Engine`, `Audio Pipeline`
+2. **Confluence space** — space key where pages will be created (e.g. `LightspeedStudios`, `NVDRV`)
+3. **Parent page** — ID or URL of the Confluence page to nest all three documents under (required — do not proceed without this)
 
-- **Jira project** — pull open issues and epics for context
-- **Confluence pages** — reference existing pages (URLs or IDs)
-- **Obsidian notes** — search the local vault by keyword
-- **Meeting notes** — paste raw text or point to a Confluence/Obsidian source
-- **Free-form context** — any extra information typed directly
+**Source code (mandatory):**
+4. **Source code location** — GitHub/GitLab repo URL, Perforce depot path, or local file system path (e.g. `https://github.com/org/repo`, `//depot/project/main`, `C:/repos/my-project`)
 
-Then follow up with one question per selected source to collect the actual values (project key, page URLs, search terms, etc.).
+**Program context — paste or share anything relevant (mandatory):**
 
-### Step 3 — Generate and publish
-Proceed only after sources are confirmed.
+Explicitly prompt the user with:
+> "Please paste or share any program materials you have — the more context you provide, the better the documents will be. This can include:
+> - **Word documents or PDFs** — project briefs, specs, proposals
+> - **POR (Plan of Record)** — feature lists, priorities, milestones
+> - **Diagrams or architecture drawings** — paste descriptions or image content
+> - **Meeting notes or decisions** — any recorded discussions or agreements
+> - **Emails or Slack threads** — relevant communications
+> - **Anything else** related to this program
+>
+> Paste the text directly, or describe what you have and I'll guide you."
+
+**Optional additional sources (multi-select):**
+5. **Jira project** — project key to pull open issues and epics
+6. **Confluence pages** — existing page URLs or IDs to reference
+7. **Obsidian notes** — keywords to search the local vault
+
+#### Source Code Handling
+
+Based on the source code location type, gather context as follows:
+
+- **GitHub / GitLab URL**: Fetch the repo's `README.md`, top-level directory listing, and any `CONTRIBUTING.md` or `docs/` folder content via the platform's API or raw URLs. Identify languages, frameworks, and major components.
+- **Perforce depot path**: Note the path for reference in the document. If accessible via the `p4` CLI, run `p4 files <path>/...` to list top-level structure.
+- **Local path**: Read `README.md`, list top-level directories and files, and identify key config files (e.g. `package.json`, `CMakeLists.txt`, `setup.py`) to infer tech stack and architecture.
+
+Use the gathered source code context to populate architecture, dependencies, and component sections across all three documents.
+
+### Step 2 — Generate and publish all three documents
+
+Proceed only after all info and context are collected.
+
+Create all three documents sequentially (SPP → SRD → SADD), each nested under the same parent page:
+
+1. Fetch each template from Confluence (Storage Format XHTML)
+2. Parse the section headings for that document type
+3. Generate fully populated Confluence Storage Format XHTML using all gathered context
+4. Publish the page nested under the parent page
+5. Report the created page URL before moving to the next document
+
+After all three are published, print a summary:
+
+```
+✓ SPP:  <url>
+✓ SRD:  <url>
+✓ SADD: <url>
+
+All three PLC documents created under: <parent page url>
+```
 
 ## What I Do
 
-1. Fetch the template page from Confluence (Storage Format XHTML)
-2. Parse all section headings to understand the document structure
-3. Gather context from all specified sources (Jira, Confluence pages, Obsidian, meeting notes)
-4. Research the topic using web searches and available knowledge
-5. Generate fully populated Confluence Storage Format XHTML for each section
-6. Publish the result as a new Confluence page via the REST API
+1. Verify Confluence credentials
+2. Collect program name, parent page, space, source code location, program context, and optional sources — all in one step
+3. Gather context from the source code (README, directory structure, tech stack)
+4. Gather context from optional sources (Jira, Confluence pages, Obsidian)
+5. Research the program using web searches and available knowledge
+6. For each of the three document types (SPP, SRD, SADD):
+   a. Fetch the official template from Confluence
+   b. Generate fully populated Confluence Storage Format XHTML
+   c. Publish as a new page nested under the parent page
+7. Report all three page URLs on completion
 
 ## Credentials
 
@@ -114,50 +157,58 @@ base_url = os.getenv('CONFLUENCE_BASE_URL')
 username = os.getenv('CONFLUENCE_USERNAME')
 token = os.getenv('CONFLUENCE_API_TOKEN')
 
-# Fetch template
-resp = requests.get(
-    f"{base_url}/rest/api/content/{template_id}",
-    params={"expand": "body.storage,space,version"},
-    auth=(username, token),
-    headers={"Accept": "application/json"},
-)
-resp.raise_for_status()
-template = resp.json()
+TEMPLATES = [
+    {"type": "SPP",  "id": "2584970595", "title": f"{program_name} Software Project Plan"},
+    {"type": "SRD",  "id": "2584970602", "title": f"{program_name} Requirement Assessment and Documentation"},
+    {"type": "SADD", "id": "2584970600", "title": f"{program_name} Design Assessment and Documentation"},
+]
 
-# Publish populated page
-body = {
-    "type": "page",
-    "title": output_title,
-    "space": {"key": space_key},
-    "body": {"storage": {"value": populated_html, "representation": "storage"}},
-}
-if parent_id:
-    body["ancestors"] = [{"id": parent_id}]
+created_pages = []
 
-r = requests.post(
-    f"{base_url}/rest/api/content",
-    json=body,
-    auth=(username, token),
-    headers={"Content-Type": "application/json", "Accept": "application/json"},
-)
-r.raise_for_status()
-page = r.json()
-print(f"Created: {base_url}/pages/{page['id']}")
+for doc in TEMPLATES:
+    # Fetch template
+    resp = requests.get(
+        f"{base_url}/rest/api/content/{doc['id']}",
+        params={"expand": "body.storage,space,version"},
+        auth=(username, token),
+        headers={"Accept": "application/json"},
+    )
+    resp.raise_for_status()
+    template = resp.json()
+
+    # populated_html is generated per document type using all gathered context
+    populated_html = generate_content(doc["type"], template, context)
+
+    # Publish page nested under parent
+    body = {
+        "type": "page",
+        "title": doc["title"],
+        "space": {"key": space_key},
+        "ancestors": [{"id": parent_id}],
+        "body": {"storage": {"value": populated_html, "representation": "storage"}},
+    }
+    r = requests.post(
+        f"{base_url}/rest/api/content",
+        json=body,
+        auth=(username, token),
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+    )
+    r.raise_for_status()
+    page = r.json()
+    url = f"{base_url}/pages/{page['id']}"
+    created_pages.append({"type": doc["type"], "url": url})
+    print(f"✓ {doc['type']}: {url}")
+
+print(f"\nAll three PLC documents created under: {base_url}/pages/{parent_id}")
 ```
-
-## Document Types Supported
-
-- **SPP** — Software Project Plan (template ID `2584970595`)
-- **SRD** — Software Requirements Document (template ID `2584970602`)
-- **SADD** — Software Architecture & Design Document (template ID `2584970600`)
 
 ## Example Requests
 
-> "Create an SPP for program 'Widget v2' in space LS. Use Jira project WIDGET for context."
-> → Title: `Widget v2 Software Project Plan`
+> "Create PLC docs for 'NNE TensorRT for RTX Plugin' in space LightspeedStudios, parent page 3178411842."
+> → Creates three pages nested under 3178411842:
+>   - `NNE TensorRT for RTX Plugin Software Project Plan`
+>   - `NNE TensorRT for RTX Plugin Requirement Assessment and Documentation`
+>   - `NNE TensorRT for RTX Plugin Design Assessment and Documentation`
 
-> "Create an SRD for 'Rendering Engine' in space NVDRV, parent page 987654. Reference https://nvidia.atlassian.net/wiki/pages/111111."
-> → Title: `Rendering Engine Requirement Assessment and Documentation`
-
-> "Create a SADD for 'Audio Pipeline' in space LS using Jira project AUDIO and these meeting notes: text:We agreed on a microservice architecture with three components..."
-> → Title: `Audio Pipeline Design Assessment and Documentation`
+> "Set up PLC documents for 'Rendering Engine' in NVDRV under page 987654, repo https://github.com/nvidia/rendering-engine, Jira project REND."
+> → Creates all three documents under page 987654 in the NVDRV space.
