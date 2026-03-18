@@ -4,30 +4,30 @@ A collection of Claude Code skills for LSS RTX Kit/Tools program management, doc
 
 ## Skills
 
-### Documents
+### Doc Generators
 
 Template-driven document generation for Confluence PLC workflows.
 
 | Skill | Description |
 |-------|-------------|
-| [plc-docs](documents/plc-docs/) | Populate a Confluence PLC template (SPP, SRD, or SADD) with real content from Jira, Confluence, Obsidian, and meeting notes — then publish as a new Confluence page |
+| [plc-docs](doc-generators/plc-docs/) | Populate a Confluence PLC template (SPP, SRD, or SADD) with real content from Jira, Confluence, Obsidian, and meeting notes — then publish as a new Confluence page |
 
-### Workstreams
+### Report Generators
 
 Workstream status reporting and stakeholder communication.
 
 | Skill | Description |
 |-------|-------------|
-| [frameview-report](workstreams/frameview-report/) | Generate a weekly FrameView Tool/SDK status report by aggregating data from Outlook emails, NVBugs, Jira, Confluence, Obsidian, and Slack — saves a formatted Word document to the Desktop |
-| [plc-top5](workstreams/plc-top5/) | Generate a "Top 5 Things" PLC status report for all LSS RTX Kit/Tools from the Jira PLC Dashboard and REL project — saves a formatted Word document to the Desktop |
+| [frameview-report](report-generators/frameview-report/) | Generate a weekly FrameView Tool/SDK status report by aggregating data from Outlook emails, NVBugs, Jira, Confluence, Obsidian, and Slack — saves a formatted Word document to the Desktop |
+| [plc-top5](report-generators/plc-top5/) | Generate a "Top 5 Things" PLC status report for all LSS RTX Kit/Tools from the Jira PLC Dashboard and REL project — saves a formatted Word document to the Desktop |
 
 ## Usage
 
 Skills are loaded automatically from this directory by Claude Code. Invoke by name:
 
-- `/documents:plc-docs` — create an SPP, SRD, or SADD on Confluence
-- `/workstreams:frameview-report` — generate a FrameView weekly status report
-- `/workstreams:plc-top5` — generate a PLC Top 5 report for all LSS RTX programs
+- `/doc-generators:plc-docs` — create an SPP, SRD, or SADD on Confluence
+- `/report-generators:frameview-report` — generate a FrameView weekly status report
+- `/report-generators:plc-top5` — generate a PLC Top 5 report for all LSS RTX programs
 
 ## Dependencies
 
