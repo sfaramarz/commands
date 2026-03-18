@@ -1,80 +1,48 @@
 # Claude Commands
 
-Shared Claude Code slash commands for the team.
+A collection of Claude Code skills for LSS RTX Kit/Tools program management, document generation, and status reporting.
 
----
+## Skills
 
-## Commands
+### Documents
 
-### `/plc-docs-generator` — PLC Document Creator
+Template-driven document generation for Confluence PLC workflows.
 
-Automatically populates a Confluence PLC (Product Life Cycle) template with real content gathered from Jira, Confluence, Obsidian, meeting notes, and web search — then publishes it as a new Confluence page.
+| Skill | Description |
+|-------|-------------|
+| [plc-docs](documents/plc-docs/) | Populate a Confluence PLC template (SPP, SRD, or SADD) with real content from Jira, Confluence, Obsidian, and meeting notes — then publish as a new Confluence page |
 
-**Supported document types:**
+### Workstreams
 
-| Type | Description |
-|------|-------------|
-| SPP  | Software Project Plan |
-| SRD  | Software Requirements Document |
-| SADD | Software Architecture & Design Document |
+Workstream status reporting and stakeholder communication.
 
-**Example usage inside Claude Code:**
+| Skill | Description |
+|-------|-------------|
+| [frameview-report](workstreams/frameview-report/) | Generate a weekly FrameView Tool/SDK status report by aggregating data from Outlook emails, NVBugs, Jira, Confluence, Obsidian, and Slack — saves a formatted Word document to the Desktop |
+| [plc-top5](workstreams/plc-top5/) | Generate a "Top 5 Things" PLC status report for all LSS RTX Kit/Tools from the Jira PLC Dashboard and REL project — saves a formatted Word document to the Desktop |
 
-```
-/plc-docs-generator
-> Create an SPP titled "Widget v2 Software Project Plan" in space LS. Use Jira project WIDGET for context.
-```
+## Usage
 
----
+Skills are loaded automatically from this directory by Claude Code. Invoke by name:
 
-## Setup
+- `/documents:plc-docs` — create an SPP, SRD, or SADD on Confluence
+- `/workstreams:frameview-report` — generate a FrameView weekly status report
+- `/workstreams:plc-top5` — generate a PLC Top 5 report for all LSS RTX programs
 
-### 1. Clone the repository
+## Dependencies
 
-```bash
-git clone https://github.com/YOUR_USERNAME/claude-commands.git
-cd claude-commands
-```
+All skills require credentials in `C:/Users/sfaramarz/jill/.env`:
 
-### 2. Set up your Confluence credentials
+| Variable | Required by |
+|----------|-------------|
+| `CONFLUENCE_BASE_URL` / `CONFLUENCE_USERNAME` / `CONFLUENCE_API_TOKEN` | plc-docs, frameview-report |
+| `JIRA_BASE_URL` / `JIRA_USERNAME` / `JIRA_API_TOKEN` | all skills |
+| `SLACK_TOKEN` | frameview-report (optional) |
 
-Create a `.env` file at the path referenced inside the command (or adjust the path in `.claude/commands/plc-docs-generator.md` to point to your own `.env`):
+NVBugs access is via `mcp__nvbugs__*` MCP tools — no manual setup needed.
 
-```env
-CONFLUENCE_BASE_URL=https://your-org.atlassian.net/wiki
-CONFLUENCE_USERNAME=your-email@your-org.com
-CONFLUENCE_API_TOKEN=your_api_token_here
-```
-
-To generate an API token: [id.atlassian.com](https://id.atlassian.com) → Security → API tokens
-
-### 3. Update the template IDs
-
-Open `.claude/commands/plc-docs-generator.md` and replace the template IDs and URLs in the **Fixed Templates** table with the correct ones for your Confluence space. Ask your team lead for the right IDs if you don't have them.
-
-### 4. Open Claude Code from this directory
+All skills that generate Word documents require `python-docx`:
 
 ```bash
-cd claude-commands
-claude
+pip install python-docx
 ```
-
-The `/plc-docs-generator` command will be available automatically. Claude Code loads commands from `.claude/commands/` in the current working directory.
-
----
-
-## Adding New Commands
-
-To add a new shared slash command:
-
-1. Create a `.md` file in `.claude/commands/`
-2. Write the instructions for Claude inside it
-3. Commit and push — teammates get it on next `git pull`
-
----
-
-## Requirements
-
-- [Claude Code](https://github.com/anthropics/claude-code) installed
-- Confluence API access
-- Python with `requests` and `python-dotenv` installed (`pip install requests python-dotenv`)

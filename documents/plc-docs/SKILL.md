@@ -1,3 +1,12 @@
+---
+name: plc-docs
+description: Populate a Confluence PLC template (SPP, SRD, or SADD) with real content from Jira, Confluence, Obsidian, and meeting notes — then publish it as a new Confluence page. Use when asked to create a Software Project Plan, Requirements Document, or Architecture Design Document.
+license: MIT
+metadata:
+  author: Sherry Faramarz
+  version: "1.0.0"
+  last-updated: "2026-03-18"
+---
 # PLC Document Creator
 
 Populate a Confluence PLC (Product Life Cycle) template page with real content using gathered context, then publish the result as a new Confluence page.

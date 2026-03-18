@@ -1,3 +1,12 @@
+---
+name: frameview-report
+description: Generate a weekly FrameView Tool/SDK status report by aggregating data from Outlook emails, NVBugs, Jira, Confluence, Obsidian, and Slack — saves a richly formatted Word document to the Desktop. Use when asked for a FrameView status update, weekly report, or Tool/SDK update email.
+license: MIT
+metadata:
+  author: Sherry Faramarz
+  version: "1.0.0"
+  last-updated: "2026-03-18"
+---
 # FrameView Report Generator
 
 Generate a weekly FrameView "Top 5" status report by pulling live data from Outlook emails (PBR/TMF threads + notable correspondence), NVBugs, Jira, Confluence, Obsidian, and Slack — then save it as a richly formatted Word document (`.docx`) on the Desktop.

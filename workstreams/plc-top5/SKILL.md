@@ -1,3 +1,12 @@
+---
+name: plc-top5
+description: Generate a "Top 5 Things" PLC status report for all LSS RTX Kit/Tools by pulling live data from the Jira PLC Dashboard and REL project — saves a formatted Word document to the Desktop. Use when asked for a PLC Top 5, program status report, or weekly LSS RTX status update.
+license: MIT
+metadata:
+  author: Sherry Faramarz
+  version: "1.0.0"
+  last-updated: "2026-03-18"
+---
 # LSS RTX Kit/Tools PLC Top 5 Report Generator
 
 Generate a "Top 5 Things" PLC (Program Level Communication) status report for all LSS RTX Kit/Tools by pulling live data from the Jira PLC Dashboard and REL project — then save it as a formatted Word document (`.docx`) on the Desktop.
