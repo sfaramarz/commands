@@ -23,14 +23,26 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv('C:/Users/sfaramarz/jill/.env')
-base_url = os.getenv('CONFLUENCE_BASE_URL')
-username = os.getenv('CONFLUENCE_USERNAME')
-token = os.getenv('CONFLUENCE_API_TOKEN')
 
-resp = requests.get(f"{base_url}/rest/api/user/current",
-    auth=(username, token), headers={"Accept": "application/json"})
+# Confluence
+confluence_url = os.getenv('CONFLUENCE_BASE_URL')
+confluence_user = os.getenv('CONFLUENCE_USERNAME')
+confluence_token = os.getenv('CONFLUENCE_API_TOKEN')
+
+resp = requests.get(f"{confluence_url}/rest/api/user/current",
+    auth=(confluence_user, confluence_token), headers={"Accept": "application/json"})
 resp.raise_for_status()
 print("Confluence auth OK:", resp.json().get("displayName"))
+
+# Jira
+jira_url = os.getenv('JIRA_BASE_URL')
+jira_user = os.getenv('JIRA_USERNAME')
+jira_token = os.getenv('JIRA_API_TOKEN')
+
+resp = requests.get(f"{jira_url}/rest/api/2/myself",
+    auth=(jira_user, jira_token), headers={"Accept": "application/json"})
+resp.raise_for_status()
+print("Jira auth OK:", resp.json().get("displayName"))
 ```
 
 Stop and report any failure. Do not proceed with broken credentials.

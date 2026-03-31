@@ -66,24 +66,26 @@ Use MCP tools. For each bug collect: bug ID, synopsis, status, engineer, severit
 
 ## 3d — Outlook Emails (always run all four)
 
+All four searches use a **2-week lookback** (`start_date = today - 14 days`, ISO 8601). Compute this date before running any search.
+
 ```
-# 1. Previous status report
+# 1. Previous status report (no date filter — find the most recent one regardless of age)
 mcp__outlook__outlook_list_messages(query="FrameView Tool Update",
     folder_name="inbox,sentitems", limit=5, sort_order="desc")
 
 # 2. PBR emails
-mcp__outlook__outlook_list_messages(query="PBR FrameView OR PBR #307",
-    folder_name="inbox,sentitems", start_date="<30 days ago>", limit=20)
+mcp__outlook__outlook_list_messages(query="PBR FrameView OR PBR #<pbr_numbers>",
+    folder_name="inbox,sentitems", start_date="<2 weeks ago>", limit=20)
 
 # 3. TMF emails
 mcp__outlook__outlook_list_messages(query="FrameView TMF OR TMF Request FrameView",
-    folder_name="inbox,sentitems", start_date="<30 days ago>", limit=20)
+    folder_name="inbox,sentitems", start_date="<2 weeks ago>", limit=20)
 
-# 4. General FrameView correspondence
+# 4. General FrameView correspondence (PRIMARY — always run, always fetch full body for top results)
 mcp__outlook__outlook_list_messages(query="FrameView",
-    folder_name="inbox,sentitems", start_date="<30 days ago>", limit=50)
+    folder_name="inbox,sentitems", start_date="<2 weeks ago>", limit=50)
 
-# Fetch full body
+# Fetch full body for any message that looks relevant
 mcp__outlook__outlook_get_message(message_id="<id>")
 ```
 

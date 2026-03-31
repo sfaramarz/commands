@@ -40,7 +40,16 @@ def generate(program_name, release_version, release_date, overall_status,
     today_formatted = today.strftime("%B %d, %Y")
 
     desktop = os.path.join(os.path.expanduser("~"), "OneDrive - NVIDIA Corporation", "Desktop")
+    if not os.path.isdir(desktop):
+        desktop = os.path.join(os.path.expanduser("~"), "Desktop")
     output_path = os.path.join(desktop, f"{program_name}_Tool_SDK_Update_{today_str}.docx")
+
+    # Handle locked file
+    if os.path.exists(output_path):
+        try:
+            os.remove(output_path)
+        except PermissionError:
+            output_path = output_path.replace(".docx", "_v2.docx")
 
     doc = Document()
 
@@ -72,16 +81,23 @@ def generate(program_name, release_version, release_date, overall_status,
     status_run.font.size = Pt(12)
     status_run.font.color.rgb = STATUS_COLORS.get(overall_status, RGBColor(0, 0, 0))
 
-    # Executive summary
-    doc.add_paragraph(executive_summary).runs[0].font.size = Pt(10)
+    # Executive summary — supports string or list of bullet strings
+    if isinstance(executive_summary, list):
+        for bullet in executive_summary:
+            doc.add_paragraph(bullet, style="List Bullet").runs[0].font.size = Pt(10)
+    else:
+        doc.add_paragraph(executive_summary).runs[0].font.size = Pt(10)
     doc.add_paragraph()
 
-    # QA Bug Fix Status
+    # QA Bug Fix Status — flat table, no group headings
     doc.add_heading("QA Bug Fix Status", level=1)
-    for group_name, bugs in bug_groups.items():
-        if not bugs:
-            continue
-        doc.add_heading(group_name, level=2)
+    all_bugs = []
+    if isinstance(bug_groups, dict):
+        for bugs in bug_groups.values():
+            all_bugs.extend(bugs)
+    else:
+        all_bugs = bug_groups
+    if all_bugs:
         table = doc.add_table(rows=1, cols=6)
         table.style = "Table Grid"
         hdr = table.rows[0].cells
@@ -97,7 +113,7 @@ def generate(program_name, release_version, release_date, overall_status,
             shd.set(qn("w:fill"), "404040")
             tcPr.append(shd)
             hdr[i].paragraphs[0].runs[0].font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        for bug in bugs:
+        for bug in all_bugs:
             row = table.add_row().cells
             for j, key in enumerate(["id", "synopsis", "status", "engineer", "last_updated", "notes"]):
                 row[j].text = str(bug.get(key, ""))
