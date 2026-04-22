@@ -172,13 +172,24 @@ Search the local Obsidian vault for relevant notes using Grep tool with the prov
 
 ## Step 3 — Fetch templates
 
-Fetch all three templates from Confluence:
+Try fetching live templates from Confluence first. If that fails (auth error, network issue, timeout), fall back to the bundled local copies.
 
 ```bash
+# Try live fetch first
 confluence-cli page get 2584970595 --format html --toon  # SPP
 confluence-cli page get 2584970602 --format html --toon  # SRD
 confluence-cli page get 2584970600 --format html --toon  # SADD
 ```
+
+**Fallback — bundled local templates** (use if any live fetch fails):
+
+| Document | Local path |
+|---|---|
+| **SPP** | `~/.claude/commands/plc-generators/plc-doc-gen/template-spp.xhtml` |
+| **SRD** | `~/.claude/commands/plc-generators/plc-doc-gen/template-srd.xhtml` |
+| **SADD** | `~/.claude/commands/plc-generators/plc-doc-gen/template-sadd.xhtml` |
+
+Read the local `.xhtml` file with the Read tool if the corresponding `confluence-cli` call fails. These are snapshots of the live templates — functionally identical.
 
 Parse each template's storage-format XHTML. Preserve the exact XHTML structure, table formats, macros (`ac:structured-macro`), and styling. Only replace placeholder text (`<Enter your text here>`, `<doc title>`, etc.) with real content.
 
