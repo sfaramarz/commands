@@ -43,7 +43,7 @@ The dashboard gadget API is not accessible. Instead, query the label directly:
 
 ```
 JQL: labels = LSS-PLC-L1 ORDER BY project ASC, updated DESC
-Fields: summary, status, project, comment, labels
+Fields: summary, status, project, comment, labels, assignee
 Max results: 200
 ```
 
@@ -84,7 +84,9 @@ Match each REL issue to a program by summary/labels. Use `duedate` or `fixVersio
 
 ## Step 3 — Build the table data
 
-For each program, produce one row: `(Tool, Definition, Release Date, PLC Status, Notes/Pending)`.
+For each program, produce one row: `(Tool, Definition, Release Date, PLC Status, PIC, Notes/Pending)`.
+
+**PIC (Person In Charge):** Pull from the Jira `assignee` field of the L1 PLC parent ticket for each program.
 
 **Content rules:**
 - **PLC-only content** — only include PLC pillar status, legal/security/SAST progress, nSpect registration, and release review info. Do NOT include product bugs, dev backlog, or feature work.
@@ -112,7 +114,7 @@ For each program, produce one row: `(Tool, Definition, Release Date, PLC Status,
 
 Use `scripts/generate-report.py` with the assembled `rows` list. Requires `python-docx` (`pip install python-docx`).
 
-Pass data as a list of tuples: `(tool_name, definition, release_date, plc_status, notes)`.
+Pass data as a list of tuples: `(tool_name, definition, release_date, plc_status, pic, notes)`.
 
 ---
 

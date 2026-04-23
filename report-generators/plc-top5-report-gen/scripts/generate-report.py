@@ -4,7 +4,7 @@ Produces a single combined .docx on the Desktop for all LSS RTX Kit/Tools progra
 
 Expected input:
   rows  list of tuples:
-    (tool_name: str, definition: str, release_date: str, plc_status: str, notes: str)
+    (tool_name: str, definition: str, release_date: str, plc_status: str, pic: str, notes: str)
 
   Rows must be pre-sorted: Done -> In Progress -> To Start.
 """
@@ -45,7 +45,7 @@ def generate(rows, extra_note=None):
     """Generate the PLC Top 5 Word document.
 
     Args:
-        rows: list of (tool_name, definition, release_date, plc_status, notes) tuples,
+        rows: list of (tool_name, definition, release_date, plc_status, pic, notes) tuples,
               pre-sorted Done -> In Progress -> To Start.
     Returns:
         output_path: str
@@ -116,21 +116,19 @@ def generate(rows, extra_note=None):
     doc.add_paragraph()
 
     # --- Table ---
-    table = doc.add_table(rows=len(rows) + 1, cols=5)
+    table = doc.add_table(rows=len(rows) + 1, cols=6)
     table.style = "Table Grid"
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
 
+    col_widths = [Cm(3.0), Cm(4.2), Cm(2.2), Cm(2.2), Cm(2.8), Cm(4.5)]
     for row_obj in table.rows:
-        row_obj.cells[0].width = Cm(3.5)
-        row_obj.cells[1].width = Cm(5.0)
-        row_obj.cells[2].width = Cm(2.5)
-        row_obj.cells[3].width = Cm(2.5)
-        row_obj.cells[4].width = Cm(5.5)
+        for i, w in enumerate(col_widths):
+            row_obj.cells[i].width = w
 
     # Header
     header_row = table.rows[0]
     _set_row_shading(header_row, HEADER_BG)
-    for i, h in enumerate(["Tool", "Definition", "Release Date", "PLC Status", "Notes / Pending"]):
+    for i, h in enumerate(["Tool", "Definition", "Release Date", "PLC Status", "PIC", "Notes / Pending"]):
         cell = header_row.cells[i]
         cell.text = ""
         run = cell.paragraphs[0].add_run(h)
@@ -140,7 +138,7 @@ def generate(rows, extra_note=None):
         cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     # Data rows
-    for r_idx, (tool, defn, rel_date, status, notes) in enumerate(rows):
+    for r_idx, (tool, defn, rel_date, status, pic, notes) in enumerate(rows):
         row_obj = table.rows[r_idx + 1]
         text_color, row_bg = STATUS_COLORS.get(status, ("000000", "FFFFFF"))
         _set_row_shading(row_obj, row_bg)
@@ -179,11 +177,17 @@ def generate(rows, extra_note=None):
         )
         c3.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # Notes (9pt)
+        # PIC (9pt)
         c4 = row_obj.cells[4]
         c4.text = ""
-        r4 = c4.paragraphs[0].add_run(notes)
+        r4 = c4.paragraphs[0].add_run(pic)
         r4.font.size = Pt(9)
+
+        # Notes (9pt)
+        c5 = row_obj.cells[5]
+        c5.text = ""
+        r5 = c5.paragraphs[0].add_run(notes)
+        r5.font.size = Pt(9)
 
     doc.add_paragraph()
 

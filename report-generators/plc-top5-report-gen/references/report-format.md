@@ -4,7 +4,7 @@
 
 **Format:** Single-page table — NOT per-program sections with numbered lists.
 
-The report is a single table with 5 columns: **Tool | Definition | Release Date | PLC Status | Notes / Pending**.
+The report is a single table with 6 columns: **Tool | Definition | Release Date | PLC Status | PIC | Notes / Pending**.
 
 Programs are sorted: **Done → In Progress → To Start**.
 
@@ -16,11 +16,11 @@ and UE plugins (and more) through structured PLC governance.
 
 Dashboard contains live updates.
 
-| Tool | Definition | Release Date | PLC Status | Notes / Pending |
-|------|------------|--------------|------------|-----------------|
-| ...  | ...        | 2026-Q2      | Done       | ...             |
-| ...  | ...        | 2026-04-15   | In Progress| ...             |
-| ...  | ...        | TBD          | To Start   | ...             |
+| Tool | Definition | Release Date | PLC Status | PIC | Notes / Pending |
+|------|------------|--------------|------------|-----|-----------------|
+| ...  | ...        | 2026-Q2      | Done       | ... | ...             |
+| ...  | ...        | 2026-04-15   | In Progress| ... | ...             |
+| ...  | ...        | TBD          | To Start   | ... | ...             |
 
 Thanks,
 Sherry Faramarz
@@ -36,6 +36,7 @@ Jason Paul, Michael Songy, Nyle Usmani, Cem Cebenoyan
 - **Done items → minimal/empty notes** — no need to elaborate on completed programs.
 - **Notes: concise, single-line** — commas to separate items. No multi-line entries.
 - **Include parent ticket ref** in Notes (e.g., LIGHTS-538, FVSDK-14).
+- **PIC** — Person In Charge, pulled from the Jira assignee of the L1 PLC parent ticket.
 - **Comfy NV Video Prep = RTX Remix** — merge into one row, never separate.
 - **RTXPT** — use "RTXPT v1.8", never "v3.0 / v1.8".
 
@@ -93,8 +94,9 @@ Jason Paul, Michael Songy, Nyle Usmani, Cem Cebenoyan
 - **Definition column**: italic, 10pt
 - **Release Date column**: normal, 10pt, centered
 - **PLC Status column**: bold, colored, centered, 10pt
+- **PIC column**: 9pt normal
 - **Notes column**: 9pt normal
-- Column widths: Tool 3.5cm, Definition 5.0cm, Release Date 2.5cm, PLC Status 2.5cm, Notes 5.5cm
+- Column widths: Tool 3.0cm, Definition 4.2cm, Release Date 2.2cm, PLC Status 2.2cm, PIC 2.8cm, Notes 4.5cm
 
 ### Output
 - Path: `C:/Users/sfaramarz/OneDrive - NVIDIA Corporation/Desktop/LSS_RTX_PLC_Top5_<YYYY-MM-DD>.docx`
