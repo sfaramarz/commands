@@ -32,7 +32,13 @@ Third-party and shared utilities.
 | [archivist](borrowed%20tools/archivist/) | Manage a vault/sources document store — ingest files from an import folder with automatic type detection, markdown conversion, classification, and filing |
 | [skill-creator](borrowed%20tools/skill-creator/) | Guide for creating new skills — scaffolding, validation, and packaging |
 | [nvsec-nspect](borrowed%20tools/nvsec-nspect/) | nSpect operations — program management, artifact registration, vulnerability lookups, and compliance checks via the nSpect REST API |
-| [plcman](borrowed%20tools/plcman/) | PLC task executor — automates MVSB compliance checks, Jira commenting, ticket transitions, and handoff report generation. [Standalone repo](https://github.com/sfaramarz/plcman) |
+| [nvsec-nspect](borrowed%20tools/nvsec-nspect/) | nSpect operations — program management, artifact registration, vulnerability lookups, and compliance checks via the nSpect REST API |
+
+### PLC Automation
+
+| Skill | Description |
+|-------|-------------|
+| [plcman](plcman/) | PLC task executor — automates MVSB compliance checks, Jira commenting, ticket transitions, and handoff report generation. [Standalone repo](https://github.com/sfaramarz/plcman) |
 
 ## Usage
 
@@ -45,7 +51,7 @@ Skills are loaded automatically from this directory by Claude Code. Invoke by na
 - `/commands:meeting-notes` — generate meeting notes from a Teams transcript
 - `/borrowed tools:archivist` — ingest and file documents into the vault
 - `/borrowed tools:skill-creator` — create a new skill
-- `/borrowed tools:plcman PROJ-123` — run PLC automation for a Jira parent ticket
+- `/plcman PROJ-123` — run PLC automation for a Jira parent ticket
 
 ## Guides
 
