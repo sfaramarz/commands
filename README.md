@@ -4,45 +4,48 @@ A collection of Claude Code skills for LSS RTX Kit/Tools program management, doc
 
 ## Skills
 
-### PLC Generators
+### Generators
 
 Template-driven document and artifact generation for PLC (Product Life Cycle) workflows.
 
 | Skill | Description |
 |-------|-------------|
-| [plc-doc-gen](plc-generators/plc-doc-gen/) | Create all three PLC documents (SPP, SRD, SADD) populated with content from source code, Jira, Confluence, Obsidian, and program materials — publishes all three as Confluence pages nested under a parent page |
-| [tava-gen](plc-generators/tava-gen/) | Generate TAVA (Threat and Vulnerability Analysis) architecture diagrams and documents from a project's source code and documentation — outputs a Mermaid diagram and Word document ready for nSpect TAVA 3.0 upload |
+| [plc-doc-gen](generators/plc-doc-gen/) | Create all three PLC documents (SPP, SRD, SADD) populated with content from source code, Jira, Confluence, Obsidian, and program materials — publishes all three as Confluence pages nested under a parent page |
+| [tava-gen](generators/tava-gen/) | Generate TAVA (Threat and Vulnerability Analysis) architecture diagrams and documents from a project's source code and documentation — outputs a Mermaid diagram and Word document ready for nSpect TAVA 3.0 upload |
 
-### Report Generators
+### Commands
 
-Workstream status reporting and stakeholder communication.
-
-| Skill | Description |
-|-------|-------------|
-| [fv-report-gen](report-generators/fv-report-gen/) | Generate a weekly FrameView Tool/SDK status report by aggregating data from Outlook emails, NVBugs, Jira, Confluence, Obsidian, and Slack — saves a formatted Word document to the Desktop |
-| [plc-top5-report-gen](report-generators/plc-top5-report-gen/) | Generate a "Top 5 Things" PLC status report for all LSS RTX Kit/Tools from the Jira PLC Dashboard and REL project — saves a formatted Word document to the Desktop |
-
-### Tools
-
-Utilities for document management and meeting workflows.
+Workstream status reporting, meeting workflows, and stakeholder communication.
 
 | Skill | Description |
 |-------|-------------|
-| [archivist](tools/archivist/) | Manage a vault/sources document store — ingest files from an import folder with automatic type detection, markdown conversion, classification, and filing |
-| [meeting-notes](tools/meeting-notes/) | Pull a Teams meeting transcript and generate structured Markdown meeting notes — asks which meeting, finds the calendar event, reads the transcript via `transcript-cli`, and saves to the vault import folder |
-| [skill-creator](tools/skill-creator/) | Guide for creating new skills — scaffolding, validation, and packaging |
+| [fv-report-gen](commands/fv-report-gen/) | Generate a weekly FrameView Tool/SDK status report by aggregating data from Outlook emails, NVBugs, Jira, Confluence, Obsidian, and Slack — saves a formatted Word document to the Desktop |
+| [plc-top5-report-gen](commands/plc-top5-report-gen/) | Generate a "Top 5 Things" PLC status report for all LSS RTX Kit/Tools from the Jira PLC Dashboard and REL project — saves a formatted Word document to the Desktop |
+| [meeting-notes](commands/meeting-notes/) | Pull a Teams meeting transcript and generate structured Markdown meeting notes — asks which meeting, finds the calendar event, reads the transcript via `transcript-cli`, and saves to the vault import folder |
+
+### Borrowed Tools
+
+Third-party and shared utilities.
+
+| Skill | Description |
+|-------|-------------|
+| [archivist](borrowed%20tools/archivist/) | Manage a vault/sources document store — ingest files from an import folder with automatic type detection, markdown conversion, classification, and filing |
+| [skill-creator](borrowed%20tools/skill-creator/) | Guide for creating new skills — scaffolding, validation, and packaging |
+| [nvsec-nspect](borrowed%20tools/nvsec-nspect/) | nSpect operations — program management, artifact registration, vulnerability lookups, and compliance checks via the nSpect REST API |
+| [plcman](borrowed%20tools/plcman/) | PLC task executor — automates MVSB compliance checks, Jira commenting, ticket transitions, and handoff report generation. [Standalone repo](https://github.com/sfaramarz/plcman) |
 
 ## Usage
 
 Skills are loaded automatically from this directory by Claude Code. Invoke by name:
 
-- `/plc-generators:plc-doc-gen` — create all three PLC documents (SPP, SRD, SADD) nested under a parent Confluence page
-- `/plc-generators:tava-gen` — generate TAVA architecture diagram and document for nSpect
-- `/report-generators:fv-report-gen` — generate a FrameView weekly status report
-- `/report-generators:plc-top5-report-gen` — generate a PLC Top 5 report for all LSS RTX programs
-- `/tools:archivist` — ingest and file documents into the vault
-- `/tools:meeting-notes` — generate meeting notes from a Teams transcript
-- `/tools:skill-creator` — create a new skill
+- `/generators:plc-doc-gen` — create all three PLC documents (SPP, SRD, SADD) nested under a parent Confluence page
+- `/generators:tava-gen` — generate TAVA architecture diagram and document for nSpect
+- `/commands:fv-report-gen` — generate a FrameView weekly status report
+- `/commands:plc-top5-report-gen` — generate a PLC Top 5 report for all LSS RTX programs
+- `/commands:meeting-notes` — generate meeting notes from a Teams transcript
+- `/borrowed tools:archivist` — ingest and file documents into the vault
+- `/borrowed tools:skill-creator` — create a new skill
+- `/borrowed tools:plcman PROJ-123` — run PLC automation for a Jira parent ticket
 
 ## Guides
 
@@ -56,7 +59,7 @@ The meeting-notes skill turns a Teams transcript into structured Markdown notes.
 - Outlook MCP server must be configured in Claude Code
 - Transcription must be enabled for the meeting (organizer or tenant setting) and you must be an attendee
 
-**Output:** `YYYY-MM-DD meeting-notes <subject>.md` saved to `vault/import/` (or override with `MEETING_NOTES_OUTPUT_DIR` env var). Contains YAML frontmatter, summary, discussion topics, decisions, action items, open questions, and key data points. After saving, the skill offers to file the notes via `/tools:archivist`.
+**Output:** `YYYY-MM-DD meeting-notes <subject>.md` saved to `vault/import/` (or override with `MEETING_NOTES_OUTPUT_DIR` env var). Contains YAML frontmatter, summary, discussion topics, decisions, action items, open questions, and key data points. After saving, the skill offers to file the notes via `/borrowed tools:archivist`.
 
 ### PLC Document Creation
 
@@ -86,7 +89,9 @@ Report generators and doc generators require credentials in `C:/Users/sfaramarz/
 
 | Server | Required by |
 |--------|-------------|
-| `maas-nvbugs` | fv-report-gen |
+| `maas-jira` | plcman, plc-doc-gen, fv-report-gen, plc-top5-report-gen |
+| `maas-confluence` | plcman, plc-doc-gen |
+| `maas-nvbugs` | plcman, fv-report-gen |
 | `outlook` | meeting-notes |
 
 ### CLI Tools
@@ -94,10 +99,14 @@ Report generators and doc generators require credentials in `C:/Users/sfaramarz/
 | Tool | Required by | Install |
 |------|-------------|---------|
 | `transcript-cli` | meeting-notes | `pip install ai-pim-utils` |
-| `python-docx` | fv-report-gen, plc-top5-report-gen | `pip install python-docx` |
+| `python-docx` | fv-report-gen, plc-top5-report-gen, plcman | `pip install python-docx` |
+| `requests` | plcman (nSpect API) | `pip install requests` |
+| `confluence-cli` | plcman, plc-doc-gen | `pip install ai-pim-utils` |
 
 ### Environment Variables (optional)
 
 | Variable | Purpose |
 |----------|---------|
 | `MEETING_NOTES_OUTPUT_DIR` | Override output folder for meeting-notes skill (auto-detects OneDrive vault if unset) |
+| `NSPECT_API_URL` | Override nSpect API base URL (default: `https://nspect.nvidia.com`) |
+| `CONFLUENCE_CLI_SPACE` | Confluence space key for page creation via confluence-cli |
