@@ -4,8 +4,8 @@
 
 - [Common Setup](#common-setup) — nSpect auth, curl fallback, confluence-cli gotchas
 - **Tier 1** — [artifact-registration](#artifact-registration) | [vuln-scan](#vuln-scan) | [release-contacts](#release-contacts) | [release-attributes](#release-attributes) | [export-compliance](#export-compliance) | [secret-scan](#secret-scan)
-- **Tier 2** — [plc-documents](#plc-documents) | [threat-assessment](#threat-assessment) | [sast-scan](#sast-scan) | [oss-compliance](#oss-compliance) | [malware-scan](#malware-scan) | [product-legal](#product-legal) | [privacy-assessment](#privacy-assessment) | [tai-model-card](#tai-model-card) | [tai-classification](#tai-classification)
-- **Tier 3** — [training](#training) | [rcca](#rcca) | [security-review](#security-review) | [tai-requirements](#tai-requirements) | [tai-test-results](#tai-test-results)
+- **Tier 2** — [plc-documents](#plc-documents) | [threat-assessment](#threat-assessment) | [sast-scan](#sast-scan) | [oss-compliance](#oss-compliance) | [malware-scan](#malware-scan) | [product-legal](#product-legal) | [privacy-assessment](#privacy-assessment) | [tai-model-card](#tai-model-card) | [tai-classification](#tai-classification) | [tai-requirements](#tai-requirements)
+- **Tier 3** — [training](#training) | [rcca](#rcca) | [security-review](#security-review) | [tai-test-results](#tai-test-results)
 - **SKIP** — [exceptions-filed](#exceptions-filed) | [release-review](#release-review)
 
 ---
@@ -348,9 +348,9 @@ After commenting, schedule follow-up with legal assignee once Legal assigns a PI
 **Check**: Search ticket description and comments for requirements documentation evidence. Search Confluence for `{program_name} TAI requirements` or `AI requirements`.
 
 **Completed**: PASS — link to requirements doc.
-**Not found**: NEEDS ACTION — "Document TAI requirements: (1) intended use and limitations, (2) training data provenance, (3) evaluation metrics and benchmarks, (4) fairness and bias considerations, (5) safety guardrails. Submit as Confluence page or attach to this ticket."
+**Not found**: Ask user: generate SRD via `/plc-generators:plc-doc-gen` (with program name, space, parent page, repo, Jira key — SRD only) or provide existing link. The SRD covers TAI requirements including intended use, training data provenance, evaluation metrics, fairness/bias considerations, and safety guardrails.
 
-**Evidence**: Requirements doc link or gap description
+**Evidence**: SRD Confluence page URL or requirements doc link
 
 ---
 

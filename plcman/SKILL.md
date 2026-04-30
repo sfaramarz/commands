@@ -76,7 +76,7 @@ Map each child ticket summary (case-insensitive) to a task type:
 | `privacy`, `Privacy Assessment`, `PII` | privacy-assessment | 2 |
 | `Model Card`, `MC++`, `Transparency Card`, `AI Card` | tai-model-card | 2 |
 | `Classification Assessment`, `TAI Classification`, `AI Classification` | tai-classification | 2 |
-| `Requirements Documentation`, `TAI Requirements` | tai-requirements | 3 |
+| `Requirements Documentation`, `TAI Requirements` | tai-requirements | 2 |
 | `Review Test Results`, `TAI Test` | tai-test-results | 3 |
 | `Exceptions Filed`, `Approved by BU VP` | exceptions-filed | SKIP |
 | `Release Review` | release-review | SKIP |
