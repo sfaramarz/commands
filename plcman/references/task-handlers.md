@@ -4,8 +4,8 @@
 
 - [Common Setup](#common-setup) — nSpect auth, curl fallback, confluence-cli gotchas
 - **Tier 1** — [artifact-registration](#artifact-registration) | [vuln-scan](#vuln-scan) | [release-contacts](#release-contacts) | [release-attributes](#release-attributes) | [export-compliance](#export-compliance) | [secret-scan](#secret-scan)
-- **Tier 2** — [plc-documents](#plc-documents) | [threat-assessment](#threat-assessment) | [sast-scan](#sast-scan) | [oss-compliance](#oss-compliance) | [malware-scan](#malware-scan) | [product-legal](#product-legal) | [privacy-assessment](#privacy-assessment)
-- **Tier 3** — [training](#training) | [rcca](#rcca) | [security-review](#security-review)
+- **Tier 2** — [plc-documents](#plc-documents) | [threat-assessment](#threat-assessment) | [sast-scan](#sast-scan) | [oss-compliance](#oss-compliance) | [malware-scan](#malware-scan) | [product-legal](#product-legal) | [privacy-assessment](#privacy-assessment) | [tai-model-card](#tai-model-card) | [tai-classification](#tai-classification)
+- **Tier 3** — [training](#training) | [rcca](#rcca) | [security-review](#security-review) | [tai-requirements](#tai-requirements) | [tai-test-results](#tai-test-results)
 - **SKIP** — [exceptions-filed](#exceptions-filed) | [release-review](#release-review)
 
 ---
@@ -262,6 +262,46 @@ After commenting, schedule follow-up with legal assignee once Legal assigns a PI
 
 ---
 
+### tai-model-card
+
+**Applies to**: AI/ML programs with model artifacts registered in nSpect.
+
+**API**: `GET /programs/{nspect_id}` — check for AI Card section. Also check nSpect UI: `https://nspect.nvidia.com/actions/compliance/ai-card?id={nspect_id}`
+
+**AI Card workflow stages**: In Development → Ready for Review → Completed Review: Team to Implement Updates → Approved, pending licensing → Approved → Released
+
+**Check**:
+1. Query nSpect program for AI Card status
+2. If AI Card exists, check current workflow stage
+
+**Pass**: AI Card status is "Approved" or "Released".
+
+**In Progress**: AI Card exists but in earlier stage → comment with current stage and next steps for that stage.
+
+**Needs Action (no AI Card)**:
+1. "Create Model Card++ (MC++) via Model Card Generator: https://trustworthy-ai-product.nvidia.com/model-card-generator/"
+2. "Submit MC++ via GitLab MR (required since Aug 1, 2025)"
+3. "Share with Dina Yared (dyared@nvidia.com) for review"
+4. "RACI: Responsible = Model PIC, Approves = Dina Yared & Michael Boone"
+
+**Evidence**: nSpect AI Card URL + workflow stage
+
+---
+
+### tai-classification
+
+**Applies to**: AI/ML programs requiring Trustworthy AI classification.
+
+**Check**: Search Jira ticket description and comments for classification assessment completion evidence. Check nSpect program for TAI classification metadata.
+
+**Pass**: Classification assessment completed and documented (link to assessment).
+
+**Needs Action**: "Complete TAI Classification Assessment for this AI product. Determine risk tier (Tier 1–4) based on: (1) intended use, (2) data sensitivity, (3) autonomy level, (4) impact scope. Submit via nSpect AI Card section. Contact Trustworthy AI team if unsure about tier."
+
+**Evidence**: Classification tier + assessment link
+
+---
+
 ## Tier 3 — Report + Next Steps
 
 ### training
@@ -298,6 +338,32 @@ After commenting, schedule follow-up with legal assignee once Legal assigns a PI
 **QA handoff**: If review complete, verify security test requirements handed off to QA Security PIC.
 
 **Evidence**: Review bug/report + QA handoff status
+
+---
+
+### tai-requirements
+
+**Applies to**: AI/ML programs with TAI Requirements Documentation tasks.
+
+**Check**: Search ticket description and comments for requirements documentation evidence. Search Confluence for `{program_name} TAI requirements` or `AI requirements`.
+
+**Completed**: PASS — link to requirements doc.
+**Not found**: NEEDS ACTION — "Document TAI requirements: (1) intended use and limitations, (2) training data provenance, (3) evaluation metrics and benchmarks, (4) fairness and bias considerations, (5) safety guardrails. Submit as Confluence page or attach to this ticket."
+
+**Evidence**: Requirements doc link or gap description
+
+---
+
+### tai-test-results
+
+**Applies to**: AI/ML programs with TAI Review Test Results tasks.
+
+**Check**: Search ticket description and comments for test result review evidence. Check for linked test reports or evaluation summaries.
+
+**Completed**: PASS — link to reviewed test results.
+**Not found**: NEEDS ACTION — "Complete TAI test results review: (1) evaluate model performance against documented metrics, (2) review bias/fairness test outcomes, (3) verify safety guardrail effectiveness, (4) document any deviations from requirements. Attach results summary to this ticket."
+
+**Evidence**: Test results review link or gap description
 
 ---
 

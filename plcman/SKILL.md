@@ -2,12 +2,13 @@
 name: plcman
 description: >-
   PLC task executor agent. Given a Jira PLC parent ticket key, reads all child
-  tickets, classifies each by PLC task type, runs automated checks against nSpect,
-  Confluence, and NVBugs, generates missing documents (SPP/SRD/SADD via plc-doc-gen,
-  TAVA via tava-gen), initiates legal processes, documents findings as minimal Jira
-  comments, and produces a Word handoff report. Use when asked to "clear PLC",
-  "progress PLC tickets", "run plcman", "check PLC status for TICKET",
-  "what's left on PLC for TICKET", or "automate PLC for TICKET".
+  tickets, classifies each by PLC task type (including TAI/Trustworthy AI tasks),
+  runs automated checks against nSpect, Confluence, and NVBugs, generates missing
+  documents (SPP/SRD/SADD via plc-doc-gen, TAVA via tava-gen), initiates legal
+  processes, documents findings as minimal Jira comments, and produces a Word handoff
+  report. Use when asked to "clear PLC", "progress PLC tickets", "run plcman",
+  "check PLC status for TICKET", "what's left on PLC for TICKET", or
+  "automate PLC for TICKET".
 ---
 
 # plcman — PLC Task Executor
@@ -73,6 +74,10 @@ Map each child ticket summary (case-insensitive) to a task type:
 | `malware` | malware-scan | 2 |
 | `Product Legal` | product-legal | 2 |
 | `privacy`, `Privacy Assessment`, `PII` | privacy-assessment | 2 |
+| `Model Card`, `MC++`, `Transparency Card`, `AI Card` | tai-model-card | 2 |
+| `Classification Assessment`, `TAI Classification`, `AI Classification` | tai-classification | 2 |
+| `Requirements Documentation`, `TAI Requirements` | tai-requirements | 3 |
+| `Review Test Results`, `TAI Test` | tai-test-results | 3 |
 | `Exceptions Filed`, `Approved by BU VP` | exceptions-filed | SKIP |
 | `Release Review` | release-review | SKIP |
 | `training`, `security champion` | training | 3 |
