@@ -42,6 +42,8 @@ Ask the user **once** for everything needed. Present a single prompt combining a
 
 This is **one user interaction** — the user replies with their info + yes/no on commenting. If the user says just "go" or provides the ticket key only, proceed with auto-resolution and ask nothing further until commenting confirmation.
 
+**Re-check runs**: If this is a 2nd+ pass (detected in Step 1.4), skip Step 0 entirely — reuse context from prior run. Go straight to discovery → classification → re-check execution.
+
 **Auto-resolution** (no user input needed):
 - **nSpect ID**: `--nspect` arg → `customfield_19907` on parent → description/labels → nSpect search. Only ask user if all fail.
 - **Confluence space**: Search Confluence for existing `{program_name}` PLC documents. Extract space key from results. Only ask user if no existing docs found.
@@ -59,7 +61,11 @@ Try in order until results found:
 2. `jql="\"Epic Link\" = <KEY>"`
 3. `jql="issue in linkedIssues(<KEY>, 'blocks')"`
 
-Capture per child: `key`, `summary`, `status`, `description`, `assignee`, `priority`, `labels`
+Capture per child: `key`, `summary`, `status`, `description`, `assignee`, `priority`, `labels`, `comment` (all comments)
+
+### 1.4 Detect Re-check Mode
+
+After fetching children, check for existing `[plcman]` comments on any ticket. If found, this is a **re-check run** (2nd+ pass). Set `recheck = true` and store the prior plcman comment per ticket for comparison in Step 3.
 
 ### 1.3 Resolve nSpect ID
 
@@ -111,6 +117,32 @@ Check nSpect for prior versions. If none → L1. If prior versions exist → def
 ## Step 3 — Execution
 
 Process Tier 1 → 2 → 3 → SKIP. For each ticket, follow the handler in [task-handlers.md](references/task-handlers.md).
+
+### Re-check Logic (when `recheck = true`)
+
+For each ticket that has a prior `[plcman]` comment:
+
+1. **Read all comments** — both plcman's prior comment and any user/team comments posted after it
+2. **Compare prior status vs current state**:
+   - Re-run the handler's check (nSpect API, Confluence search, etc.) to get fresh data
+   - Read user comments for evidence of completed work (e.g., "NVBug filed: 1234567", "OSRB approved", "scan completed", links to docs/reports)
+3. **Determine outcome**:
+   - **Prior NEEDS ACTION/FAIL → now passes** (API confirms or user comment provides evidence): Update status to PASS, recommend closing the ticket → "Requirement satisfied. Recommend transition to Done."
+   - **Prior NEEDS ACTION/FAIL → user addressed but API not yet updated**: Status stays IN PROGRESS → "User action completed per comment. Awaiting nSpect/system update to confirm."
+   - **Prior IN PROGRESS → now passes**: Same as above — recommend Done.
+   - **Prior PASS → still passes**: Skip — no new comment needed.
+   - **Prior status → still failing, no user action**: Post a follow-up comment with remaining actions. Reference the prior comment date.
+4. **Comment format for re-check**:
+   ```
+   [plcman] PLC Re-check — <YYYY-MM-DD>
+
+   Prior status (<prior-date>): <PRIOR-STATUS>
+   Current status: PASS / FAIL / IN PROGRESS
+   <What changed since last check>
+   <If PASS: "Requirement satisfied. Recommend transition to Done.">
+   <If still open: remaining actions>
+   ```
+5. **Transition recommendations**: When a ticket passes on re-check, suggest transitioning to Done (still requires user confirmation per rules). Batch all Done-ready tickets into a single recommendation at the end: "These tickets now pass and can be closed: {list}. Transition to Done?"
 
 ### nSpect Authentication
 
