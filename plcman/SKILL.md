@@ -1,6 +1,6 @@
 ---
 name: plcman
-version: 0.1.0
+version: 0.2.0
 description: >-
   PLC task executor agent. Given a Jira PLC parent ticket key, reads all child
   tickets, classifies each by PLC task type (including TAI/Trustworthy AI tasks),
