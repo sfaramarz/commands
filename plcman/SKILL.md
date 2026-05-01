@@ -1,5 +1,6 @@
 ---
 name: plcman
+version: 0.1.0-alpha.1
 description: >-
   PLC task executor agent. Given a Jira PLC parent ticket key, reads all child
   tickets, classifies each by PLC task type (including TAI/Trustworthy AI tasks),
@@ -53,7 +54,7 @@ Capture per child: `key`, `summary`, `status`, `description`, `assignee`, `prior
 
 ### 1.3 Resolve nSpect ID
 
-Priority: `--nspect` arg → user-provided → parent ticket description/labels (pattern `NSPECT-XXXX-XXXX`) → nSpect search by program name.
+Priority: `--nspect` arg → Jira field `customfield_19907` ("nspect ID") on parent ticket → parent ticket description/labels (pattern `NSPECT-XXXX-XXXX`) → nSpect search by program name. Always request `customfield_19907` when fetching the parent ticket.
 
 ## Step 2 — Classification
 
@@ -135,6 +136,16 @@ After commenting, transition out of Backlog: PASS/FAIL/IN PROGRESS/NEEDS ACTION 
 ## Step 5 — Handoff Report
 
 Generate Word doc via `python-docx`. See [handoff-template.md](references/handoff-template.md). Save to `~/Desktop/plcman-<PROGRAM>-<DATE>.docx`.
+
+After generating, attach the report to the parent ticket via Jira REST API:
+
+```bash
+source ~/.claude/jill/.env
+curl -s -u "$JIRA_USERNAME:$JIRA_API_TOKEN" \
+  -X POST -H "X-Atlassian-Token: no-check" \
+  -F "file=@$HOME/Desktop/plcman-<PROGRAM>-<DATE>.docx" \
+  "$JIRA_BASE_URL/rest/api/2/issue/<PARENT-KEY>/attachments"
+```
 
 ## Rules
 

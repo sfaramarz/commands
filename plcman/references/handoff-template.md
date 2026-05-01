@@ -99,3 +99,17 @@ Final line: `Release Review (TICKET-KEY) — user to initiate after all above it
 - Table: borders on all cells, header row bold with dark gray background (`404040`, white text)
 - Page: Letter size, 0.75" margins
 - Footer: "plcman — PLC Task Executor | Confidential"
+
+### Attach to Parent Ticket
+
+After saving the `.docx`, attach it to the parent PLC ticket via Jira REST API:
+
+```bash
+source ~/.claude/jill/.env
+curl -s -u "$JIRA_USERNAME:$JIRA_API_TOKEN" \
+  -X POST -H "X-Atlassian-Token: no-check" \
+  -F "file=@$HOME/Desktop/plcman-<PROGRAM>-<DATE>.docx" \
+  "$JIRA_BASE_URL/rest/api/2/issue/<PARENT-KEY>/attachments"
+```
+
+Verify HTTP 200 response. The Jira MCP server does not support attachments, so this must use curl directly.
