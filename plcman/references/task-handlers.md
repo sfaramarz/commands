@@ -361,7 +361,7 @@ After commenting, schedule follow-up with legal assignee once Legal assigns a PI
 **Check**: Search ticket description and comments for requirements documentation evidence. Search Confluence for `{program_name} TAI requirements` or `AI requirements`.
 
 **Completed**: PASS — link to requirements doc.
-**Not found**: Ask user: generate SRD via `/plc-generators:plc-doc-gen` (with program name, space, parent page, repo, Jira key — SRD only) or provide existing link. The SRD covers TAI requirements including intended use, training data provenance, evaluation metrics, fairness/bias considerations, and safety guardrails.
+**Not found**: Generate SRD via `/plc-generators:plc-doc-gen` (with program name, space, parent page, repo, Jira key — SRD only). The SRD covers TAI requirements including intended use, training data provenance, evaluation metrics, fairness/bias considerations, and safety guardrails. Source code repo is required — if not provided in Step 0, ask for it now.
 
 **Evidence**: SRD Confluence page URL or requirements doc link
 

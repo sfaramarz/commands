@@ -29,14 +29,22 @@ description: >-
 
 ## Step 0 — Gather Context
 
-Ask the user for:
-1. **Program materials** — POR, specs, architecture diagrams, design docs, meeting notes
-2. **Source code repo** — GitHub/GitLab URL or local path (required for doc generation; skip with `--no-source` if truly unavailable). Warn user that SADD/TAVA quality degrades significantly without source code.
-3. **Project knowledge base** — GitLab/GitHub URL to a project KB repo (optional, improves doc-gen quality). Pass to `/plc-generators:plc-doc-gen` and `/plc-generators:tava-gen` as additional context source.
-4. **nSpect ID** — if not in the Jira ticket or `--nspect` arg
-5. **Confluence space** — where PLC documents live or should be published
-6. **Known blockers** — tickets needing special handling
-7. **Commenting authorization** — confirm before posting any Jira comments
+Ask the user **once** for everything needed. Present a single prompt combining all items below — never ask them one at a time:
+
+> To run plcman on **{TICKET}**, I need a few things. Please provide what you have (skip any that don't apply):
+> 1. **Source code repo** — GitLab/GitHub URL (required for SADD/TAVA quality)
+> 2. **Program materials** — POR, specs, architecture docs, design docs, meeting notes
+> 3. **Project KB repo** — GitLab/GitHub URL if one exists (optional, improves doc-gen)
+> 4. **Known blockers** — any tickets needing special handling
+>
+> I'll auto-resolve: nSpect ID (from Jira `customfield_19907`), Confluence space (from existing PLC docs).
+> I'll post findings as comments on each ticket and transition them out of Backlog. OK to proceed?
+
+This is **one user interaction** — the user replies with their info + yes/no on commenting. If the user says just "go" or provides the ticket key only, proceed with auto-resolution and ask nothing further until commenting confirmation.
+
+**Auto-resolution** (no user input needed):
+- **nSpect ID**: `--nspect` arg → `customfield_19907` on parent → description/labels → nSpect search. Only ask user if all fail.
+- **Confluence space**: Search Confluence for existing `{program_name}` PLC documents. Extract space key from results. Only ask user if no existing docs found.
 
 ## Step 1 — Discovery
 
@@ -98,7 +106,7 @@ After classification, determine release level:
 - **L1 (Full)**: First release or security-relevant changes (new attack surface, dependencies, architecture, data collection). All MVSB tasks required.
 - **L0 (Streamlined)**: Prior L1 completed, no security-relevant changes, all prior findings remediated. Can skip threat assessment and full security review, but must still complete: artifact registration, vuln scan, secret scan, SAST, OSS compliance, export compliance.
 
-Check nSpect for prior versions. If none → L1. If prior versions exist → ask user about security-relevant changes.
+Check nSpect for prior versions. If none → L1. If prior versions exist → default to L0 unless ticket labels, description, or prior comments indicate security-relevant changes. Do not ask the user — infer from available data. User can override with `--l1` flag.
 
 ## Step 3 — Execution
 
