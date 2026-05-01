@@ -16,7 +16,7 @@ description: >-
 
 ## Input
 
-`$ARGUMENTS` — Jira parent PLC ticket key (e.g., `FVSDK-100`). Optional: `--nspect <NSPECT-XXXX-XXXX>`
+`$ARGUMENTS` — Jira parent PLC ticket key (e.g., `FVSDK-100`). Optional: `--nspect <NSPECT-XXXX-XXXX>`, `--kb <gitlab-url>`
 
 ## Overview
 
@@ -31,11 +31,12 @@ description: >-
 
 Ask the user for:
 1. **Program materials** — POR, specs, architecture diagrams, design docs, meeting notes
-2. **Source code repo** — GitHub/GitLab URL or local path
-3. **nSpect ID** — if not in the Jira ticket or `--nspect` arg
-4. **Confluence space** — where PLC documents live or should be published
-5. **Known blockers** — tickets needing special handling
-6. **Commenting authorization** — confirm before posting any Jira comments
+2. **Source code repo** — GitHub/GitLab URL or local path (required for doc generation; skip with `--no-source` if truly unavailable). Warn user that SADD/TAVA quality degrades significantly without source code.
+3. **Project knowledge base** — GitLab/GitHub URL to a project KB repo (optional, improves doc-gen quality). Pass to `/plc-generators:plc-doc-gen` and `/plc-generators:tava-gen` as additional context source.
+4. **nSpect ID** — if not in the Jira ticket or `--nspect` arg
+5. **Confluence space** — where PLC documents live or should be published
+6. **Known blockers** — tickets needing special handling
+7. **Commenting authorization** — confirm before posting any Jira comments
 
 ## Step 1 — Discovery
 
@@ -67,7 +68,7 @@ Map each child ticket summary (case-insensitive) to a task type:
 | `contacts`, `PLC Security PIC` | release-contacts | 1 |
 | `release attributes` | release-attributes | 1 |
 | `export compliance` | export-compliance | 1 |
-| `secret scan`, `credential` | secret-scan | 1 |
+| `secret scan`, `secret scanning`, `(SS)`, `credential` | secret-scan | 1 |
 | `SPP`, `SRD`, `SADD`, `Software Project Plan`, `Requirements`, `Design` | plc-documents | 2 |
 | `threat`, `TAVA` | threat-assessment | 2 |
 | `SAST`, `static analysis`, `code scan` | sast-scan | 2 |
@@ -87,6 +88,8 @@ Map each child ticket summary (case-insensitive) to a task type:
 
 No match → `unknown` (Tier 3). Skip tickets already `Done`.
 
+**Classification priority**: When a summary could match multiple patterns, prefer the most specific match. The `(SS)` prefix in Jira summaries always means Secret Scanning — never map it to export-compliance or any other type. If no pattern matches, classify as `unknown` (Tier 3) — never guess.
+
 **Tiers**: 1 = auto-verify via nSpect, 2 = check + remediate, 3 = report + next steps, SKIP = special handling.
 
 ### L0 vs L1 Determination
@@ -104,8 +107,8 @@ Process Tier 1 → 2 → 3 → SKIP. For each ticket, follow the handler in [tas
 ### nSpect Authentication
 
 ```bash
-NSPECT_TOOL="$HOME/.claude/commands/tools/nvsec-nspect/scripts/nspect_tool.py"
-AUTH="$HOME/.claude/commands/tools/nvsec-nspect/scripts/auth.py"
+NSPECT_TOOL="$HOME/.claude/commands/borrowed tools/nvsec-nspect/scripts/nspect_tool.py"
+AUTH="$HOME/.claude/commands/borrowed tools/nvsec-nspect/scripts/auth.py"
 TOKEN=$(python3 $AUTH ensure-token); AUTH_EXIT=$?
 ```
 

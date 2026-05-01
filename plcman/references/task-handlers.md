@@ -15,8 +15,8 @@
 ### nSpect tool paths
 
 ```
-NSPECT_TOOL="$HOME/.claude/commands/tools/nvsec-nspect/scripts/nspect_tool.py"
-AUTH="$HOME/.claude/commands/tools/nvsec-nspect/scripts/auth.py"
+NSPECT_TOOL="$HOME/.claude/commands/borrowed tools/nvsec-nspect/scripts/nspect_tool.py"
+AUTH="$HOME/.claude/commands/borrowed tools/nvsec-nspect/scripts/auth.py"
 ```
 
 All nSpect calls: `python3 $NSPECT_TOOL <METHOD> <PATH> [--data JSON]`
@@ -99,11 +99,15 @@ curl -s "https://nspect.nvidia.com/pm/api/v1.0/public{path}" -H "Authorization: 
 
 ### export-compliance
 
-**Check**: Search NVBugs (`nvbugs_search` for "export compliance {program_name}") and Jira (`summary ~ "export compliance"`).
+**Step 1 — Check nSpect first**: `GET /programs/{nspect_id}` — look for `export-compliance-bug` in the response metadata.
+- If metadata shows an EC bug is linked (value is NOT "No export compliance bug linked to this program version.") → **PASS**. Evidence: nSpect EC status + `https://nspect.nvidia.com/export-compliance/bug?id={nspect_id}`
+- Also check the program's Registration Health Score via `GET /programs/{nspect_id}/healthscore` — if EC component shows complete/1000, that's additional confirmation.
+
+**Step 2 — Fallback search**: If nSpect metadata is inconclusive, search NVBugs (`nvbugs_search` for "export compliance {program_name}") and Jira (`summary ~ "export compliance"`).
+
+**Pass**: EC bug linked in nSpect OR EC bug/ticket found in NVBugs/Jira.
 
 **Lead time**: Minimum **2 business days**. Flag urgency if release within 1 week.
-
-**Pass**: Export compliance bug/ticket exists and linked.
 
 **Fail (not found)**: NVBugs MCP lacks create/clone. Post direct clone link:
 - URL: `https://nvbugs.nvidia.com/NvBugs5/SWBug/CloneBug.aspx?BugID=4702316`
@@ -111,7 +115,7 @@ curl -s "https://nspect.nvidia.com/pm/api/v1.0/public{path}" -H "Authorization: 
 - Link new NVBug back to PLC ticket
 - Mark as show stopper
 
-**Evidence**: NVBugs ID or Jira key
+**Evidence**: nSpect EC metadata status, NVBugs ID, or Jira key
 
 ---
 
@@ -119,11 +123,20 @@ curl -s "https://nspect.nvidia.com/pm/api/v1.0/public{path}" -H "Authorization: 
 
 **API**: `GET /programs/{nspect_id}/secrets`
 
-**Pass**: No verified secrets found.
+**Response parsing**: The API returns secrets grouped by repo/branch. Each entry has metadata fields:
+- `scan-complete`: `SUCCESS` means scan ran; anything else means scan incomplete
+- `verified`: integer count of **verified (live) credentials** — only these block release
+- Unverified and allowlisted secrets are excluded from pass/fail
 
-**Fail**: Count + "Rotate compromised credentials and re-scan. See nSpect secrets dashboard."
+**Pass**: `scan-complete` = `SUCCESS` AND `verified` = 0 across all repos/branches.
 
-**Evidence**: Secret scan summary
+**Fail (verified > 0)**: "{count} verified secret(s) found. Rotate compromised credentials immediately, remove from source, rebuild, and re-scan. See nSpect secrets dashboard."
+
+**Fail (scan incomplete)**: "Secret scan not completed. Trigger scan in nSpect → Program → Secrets."
+
+**Ignore**: Unverified secrets (detected but not confirmed live) — do NOT count these as failures.
+
+**Evidence**: Per-repo verified count + `https://nspect.nvidia.com/review?id={nspect_id}` (Secrets tab)
 
 ---
 
@@ -135,7 +148,7 @@ curl -s "https://nspect.nvidia.com/pm/api/v1.0/public{path}" -H "Authorization: 
 
 **All found**: PASS — link to each.
 
-**Any missing**: Ask user: generate via `/plc-generators:plc-doc-gen` (with program name, space, parent page, repo, Jira key) or provide existing links.
+**Any missing**: Generate via `/plc-generators:plc-doc-gen` (with program name, space, parent page, repo, Jira key). Source code repo is required — if not provided in Step 0, ask for it now before generating. Without source code, SADD quality is severely degraded.
 
 **Evidence**: Confluence page URLs for SPP, SRD, SADD
 
@@ -149,7 +162,7 @@ If 404 from nspect_tool.py → use curl fallback. A 400 "Input payload validatio
 
 **TAVA exists**: PASS — link to report.
 
-**TAVA missing**: Ask user: generate via `/plc-generators:tava-gen` (with program name, version, architecture, nSpect ID) or provide existing.
+**TAVA missing**: Generate via `/plc-generators:tava-gen` (with program name, version, architecture, nSpect ID). Source code repo is required for quality output — if not provided in Step 0, ask for it now.
 
 **After generation**, publish to Confluence:
 1. Convert `~/Desktop/tava-output/architecture.md` to Confluence XHTML via Python
