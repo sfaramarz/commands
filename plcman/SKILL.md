@@ -82,7 +82,7 @@ Map each child ticket summary (case-insensitive) to a task type:
 | `contacts`, `PLC Security PIC` | release-contacts | 1 |
 | `release attributes` | release-attributes | 1 |
 | `export compliance` | export-compliance | 1 |
-| `secret scan`, `secret scanning`, `(SS)`, `credential` | secret-scan | 1 |
+| `secret scan`, `secret scanning`, `credential` | secret-scan | 1 |
 | `SPP`, `SRD`, `SADD`, `Software Project Plan`, `Requirements`, `Design` | plc-documents | 2 |
 | `threat`, `TAVA` | threat-assessment | 2 |
 | `SAST`, `static analysis`, `code scan` | sast-scan | 2 |
@@ -102,7 +102,7 @@ Map each child ticket summary (case-insensitive) to a task type:
 
 No match → `unknown` (Tier 3). Skip tickets already `Done`.
 
-**Classification priority**: When a summary could match multiple patterns, prefer the most specific match. The `(SS)` prefix in Jira summaries always means Secret Scanning — never map it to export-compliance or any other type. If no pattern matches, classify as `unknown` (Tier 3) — never guess.
+**Classification priority**: When a summary could match multiple patterns, prefer the most specific match. The `(SS)` prefix in Jira summaries means "Show Stopper" (a priority indicator), NOT "Secret Scanning" — do not use it for classification. Actual Secret Scanning tickets contain the words "Secret Scanning" in the summary. If no pattern matches, classify as `unknown` (Tier 3) — never guess.
 
 **Tiers**: 1 = auto-verify via nSpect, 2 = check + remediate, 3 = report + next steps, SKIP = special handling.
 
@@ -152,9 +152,9 @@ AUTH="$HOME/.claude/commands/borrowed tools/nvsec-nspect/scripts/auth.py"
 TOKEN=$(python3 $AUTH ensure-token); AUTH_EXIT=$?
 ```
 
-Exit 0 = proceed, exit 2 = device code login. If `nspect_tool.py` returns 404, fall back to curl:
+Exit 0 = proceed, exit 2 = device code login. If `nspect_tool.py` returns 404, fall back to curl with `-L` (follow redirects):
 ```bash
-curl -s "https://nspect.nvidia.com/pm/api/v1.0/public{path}" -H "Authorization: Bearer $TOKEN"
+curl -sL "https://nspect.nvidia.com/pm/api/v1.0/public{path}" -H "Authorization: Bearer $TOKEN"
 ```
 
 ## Step 4 — Documentation

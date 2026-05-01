@@ -23,11 +23,11 @@ All nSpect calls: `python3 $NSPECT_TOOL <METHOD> <PATH> [--data JSON]`
 
 ### nSpect curl fallback
 
-`nspect_tool.py` can 404 due to Python redirect handling. Fall back to curl:
+`nspect_tool.py` can 404 due to Python redirect handling. Fall back to curl with `-L` (follow redirects):
 
 ```bash
 TOKEN=$(python3 $AUTH ensure-token)
-curl -s "https://nspect.nvidia.com/pm/api/v1.0/public{path}" -H "Authorization: Bearer $TOKEN"
+curl -sL "https://nspect.nvidia.com/pm/api/v1.0/public{path}" -H "Authorization: Bearer $TOKEN"
 ```
 
 ### confluence-cli gotchas
