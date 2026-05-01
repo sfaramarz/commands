@@ -38,7 +38,7 @@ Third-party and shared utilities.
 
 | Skill | Description |
 |-------|-------------|
-| [plcman](plcman/) `v0.1.0-alpha.1` | PLC task executor — automates MVSB compliance checks, Jira commenting, ticket transitions, and handoff report generation. [Standalone repo](https://github.com/sfaramarz/plcman) |
+| [plcman](plcman/) `v0.1.0` | PLC task executor — automates MVSB compliance checks, Jira commenting, ticket transitions, and handoff report generation. [Standalone repo](https://github.com/sfaramarz/plcman) |
 
 ## Usage
 
