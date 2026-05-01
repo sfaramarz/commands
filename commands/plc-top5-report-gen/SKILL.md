@@ -95,7 +95,7 @@ Map each child ticket summary (case-insensitive) to a task type using plcman's c
 | `contacts`, `PLC Security PIC` | release-contacts | 1 |
 | `release attributes` | release-attributes | 1 |
 | `export compliance` | export-compliance | 1 |
-| `secret scan`, `(SS)`, `credential` | secret-scan | 1 |
+| `secret scan`, `secret scanning`, `credential` | secret-scan | 1 |
 | `SPP`, `SRD`, `SADD` | plc-documents | 2 |
 | `threat`, `TAVA` | threat-assessment | 2 |
 | `SAST`, `static analysis`, `code scan` | sast-scan | 2 |
