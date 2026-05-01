@@ -6,7 +6,7 @@
 
 The report is a single table with 6 columns: **Tool | Definition | Release Date | PLC Status | PIC | Notes / Pending**.
 
-Programs are sorted: **Done → In Progress → To Start**.
+Programs are sorted: **Done → In Progress → At Risk → To Start**.
 
 ```
 Top 5 Things
@@ -40,6 +40,41 @@ Jason Paul, Michael Songy, Nyle Usmani, Cem Cebenoyan
 - **Comfy NV Video Prep = RTX Remix** — merge into one row, never separate.
 - **RTXPT** — use "RTXPT v1.8", never "v3.0 / v1.8".
 
+## Enriched Notes Format (from plcman data)
+
+Notes are composed from plcman-sourced data in this order:
+
+1. **Parent ticket ref** — always first (e.g., `LIGHTS-538`)
+2. **Progress fraction** — `"10/14 done"` (omit for Done programs)
+3. **Key blockers** — top 2-3 risk items from nSpect/plcman (e.g., `"2C vulns"`, `"EC pending"`, `"SAST not configured"`)
+4. **Lead time warnings** — only when at risk (e.g., `"legal 3w left (needs 4w)"`)
+
+**Examples:**
+- Done program: `"LIGHTS-538"`
+- Healthy In Progress: `"FVSDK-14, 10/14 done"`
+- In Progress with risks: `"LIGHTS-600, 6/15 done, 2C/1H vulns, EC pending"`
+- At Risk: `"LIGHTS-700, 3/12 done, SAST not configured, legal 3w left (needs 4w)"`
+
+**Blockers vocabulary** (use these exact short forms in Notes):
+| Condition | Short form |
+|---|---|
+| Critical/High vulnerabilities | `"2C/1H vulns"` (use actual counts) |
+| Verified secrets found | `"1 verified secret"` |
+| No artifacts registered | `"not registered"` |
+| SAST not configured | `"SAST not configured"` |
+| Export compliance not started | `"EC pending"` |
+| Legal lead time at risk | `"legal Xw left (needs Yw)"` |
+| Secret scan incomplete | `"secret scan incomplete"` |
+| OSRB review pending | `"OSRB pending"` |
+
+## Progress Sub-text in PLC Status Cell
+
+The PLC Status cell shows two lines:
+1. **Status label** — bold, colored (e.g., "In Progress")
+2. **Progress fraction** — smaller grey text (e.g., "10/14 tasks")
+
+Omit the progress line for Done programs (all tasks complete).
+
 ## Known Tool Definitions (italic in table)
 
 | Tool | Definition |
@@ -67,14 +102,19 @@ Jason Paul, Michael Songy, Nyle Usmani, Cem Cebenoyan
 | REL project | `https://jirasw.nvidia.com/projects/REL/issues/REL-23?filter=allopenissues` |
 | LSS PLC L1 Filter | `labels = LSS-PLC-L1` (Jira filter ID 153065) |
 | NVBug | `https://nvbugspro.nvidia.com/bug/<id>` |
+| nSpect program | `https://nspect.nvidia.com/review?id=<nspect_id>` |
+| nSpect EC | `https://nspect.nvidia.com/export-compliance/bug?id=<nspect_id>` |
 
 ## PLC Status Rules
 
 | Condition | PLC Status |
 |---|---|
 | All pillars Done or Signed-off | **Done** |
+| `risk_level` = `blocker` (C/H vulns, verified secrets, or critical lead time miss) | **At Risk** |
 | Any pillar In Progress / Under Review / Waiting | **In Progress** |
 | All pillars in Backlog or To Do (nothing started) | **To Start** |
+
+**Sort order:** Done → In Progress → At Risk → To Start.
 
 ## Word Document Formatting Spec
 
@@ -89,6 +129,7 @@ Jason Paul, Michael Songy, Nyle Usmani, Cem Cebenoyan
 - **Header row**: dark blue background (`#1F497D`), white bold text, 10pt, centered
 - **Done rows**: light green background (`#E2F0D9`), green status text (`#008000`)
 - **In Progress rows**: light yellow background (`#FFF2CC`), amber status text (`#BF8F00`)
+- **At Risk rows**: light red background (`#FDE8E8`), red status text (`#C00000`), bold red "!" prefix on Tool name
 - **To Start rows**: light grey background (`#F2F2F2`), grey status text (`#7F7F7F`)
 - **Tool column**: bold, 10pt
 - **Definition column**: italic, 10pt

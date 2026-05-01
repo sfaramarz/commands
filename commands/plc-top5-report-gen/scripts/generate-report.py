@@ -3,10 +3,13 @@ PLC Top 5 Report Generator
 Produces a single combined .docx on the Desktop for all LSS RTX Kit/Tools programs.
 
 Expected input:
-  rows  list of tuples:
-    (tool_name: str, definition: str, release_date: str, plc_status: str, pic: str, notes: str)
+  rows  list of dicts with keys:
+    tool: str, definition: str, release_date: str, plc_status: str, pic: str, notes: str
+  Optional keys:
+    progress: str (e.g., "10/14"), risk_level: str ("none" / "warning" / "blocker")
 
-  Rows must be pre-sorted: Done -> In Progress -> To Start.
+  Also accepts legacy 6-tuples for backward compatibility.
+  Rows must be pre-sorted: Done -> In Progress -> At Risk -> To Start.
 """
 
 from datetime import date
@@ -19,14 +22,29 @@ from docx.oxml import OxmlElement
 import os
 
 
-# Status -> (text_color_hex, row_bg_hex)
 STATUS_COLORS = {
     "Done":        ("008000", "E2F0D9"),
     "In Progress": ("BF8F00", "FFF2CC"),
+    "At Risk":     ("C00000", "FDE8E8"),
     "To Start":    ("7F7F7F", "F2F2F2"),
 }
 
 HEADER_BG = "1F497D"
+
+
+def _normalize_row(row):
+    if isinstance(row, dict):
+        return row
+    return {
+        "tool": row[0],
+        "definition": row[1],
+        "release_date": row[2],
+        "plc_status": row[3],
+        "pic": row[4],
+        "notes": row[5],
+        "progress": row[6] if len(row) > 6 else "",
+        "risk_level": row[7] if len(row) > 7 else "none",
+    }
 
 
 def _set_cell_shading(cell, color_hex):
@@ -45,11 +63,13 @@ def generate(rows, extra_note=None):
     """Generate the PLC Top 5 Word document.
 
     Args:
-        rows: list of (tool_name, definition, release_date, plc_status, pic, notes) tuples,
-              pre-sorted Done -> In Progress -> To Start.
+        rows: list of dicts (or legacy 6-tuples), pre-sorted Done -> In Progress -> At Risk -> To Start.
+        extra_note: optional string shown below dashboard line (e.g., nSpect availability note).
     Returns:
         output_path: str
     """
+    rows = [_normalize_row(r) for r in rows]
+
     today = date.today()
     today_str = today.strftime("%Y-%m-%d")
 
@@ -63,7 +83,6 @@ def generate(rows, extra_note=None):
 
     output_path = os.path.join(desktop, f"LSS_RTX_PLC_Top5_{today_str}.docx")
 
-    # Remove stale file if possible
     if os.path.exists(output_path):
         try:
             os.remove(output_path)
@@ -88,7 +107,7 @@ def generate(rows, extra_note=None):
     m_bold.bold = True
     m_bold.font.size = Pt(10)
     m_text = mission.add_run(
-        "Drive secure, compliant releases for NVIDIA\u2019s RTX developer "
+        "Drive secure, compliant releases for NVIDIA’s RTX developer "
         "tools and UE plugins (and more) through structured PLC governance."
     )
     m_text.italic = True
@@ -138,33 +157,42 @@ def generate(rows, extra_note=None):
         cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
     # Data rows
-    for r_idx, (tool, defn, rel_date, status, pic, notes) in enumerate(rows):
+    for r_idx, row_data in enumerate(rows):
         row_obj = table.rows[r_idx + 1]
+        status = row_data["plc_status"]
+        progress = row_data.get("progress", "")
+        risk_level = row_data.get("risk_level", "none")
+
         text_color, row_bg = STATUS_COLORS.get(status, ("000000", "FFFFFF"))
         _set_row_shading(row_obj, row_bg)
 
-        # Tool (bold)
+        # Tool (bold; red "!" prefix for blocker rows)
         c0 = row_obj.cells[0]
         c0.text = ""
-        r0 = c0.paragraphs[0].add_run(tool)
+        if risk_level == "blocker":
+            r0_mark = c0.paragraphs[0].add_run("! ")
+            r0_mark.bold = True
+            r0_mark.font.size = Pt(10)
+            r0_mark.font.color.rgb = RGBColor(0xC0, 0x00, 0x00)
+        r0 = c0.paragraphs[0].add_run(row_data["tool"])
         r0.font.size = Pt(10)
         r0.bold = True
 
         # Definition (italic)
         c1 = row_obj.cells[1]
         c1.text = ""
-        r1 = c1.paragraphs[0].add_run(defn)
+        r1 = c1.paragraphs[0].add_run(row_data["definition"])
         r1.font.size = Pt(10)
         r1.italic = True
 
         # Release Date (centered)
         c2 = row_obj.cells[2]
         c2.text = ""
-        r2 = c2.paragraphs[0].add_run(rel_date)
+        r2 = c2.paragraphs[0].add_run(row_data["release_date"])
         r2.font.size = Pt(10)
         c2.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        # PLC Status (centered, colored, bold)
+        # PLC Status (centered, colored, bold) + progress sub-text
         c3 = row_obj.cells[3]
         c3.text = ""
         r3 = c3.paragraphs[0].add_run(status)
@@ -177,16 +205,23 @@ def generate(rows, extra_note=None):
         )
         c3.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
 
+        if progress and status != "Done":
+            progress_para = c3.add_paragraph()
+            progress_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_run = progress_para.add_run(f"{progress} tasks")
+            p_run.font.size = Pt(8)
+            p_run.font.color.rgb = RGBColor(0x7F, 0x7F, 0x7F)
+
         # PIC (9pt)
         c4 = row_obj.cells[4]
         c4.text = ""
-        r4 = c4.paragraphs[0].add_run(pic)
+        r4 = c4.paragraphs[0].add_run(row_data["pic"])
         r4.font.size = Pt(9)
 
         # Notes (9pt)
         c5 = row_obj.cells[5]
         c5.text = ""
-        r5 = c5.paragraphs[0].add_run(notes)
+        r5 = c5.paragraphs[0].add_run(row_data["notes"])
         r5.font.size = Pt(9)
 
     doc.add_paragraph()
